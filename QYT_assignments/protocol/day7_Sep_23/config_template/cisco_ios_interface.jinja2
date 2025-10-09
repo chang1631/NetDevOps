@@ -1,0 +1,5 @@
+{% for interface in router_dict.interface_list %}
+    interface {{ interface.interface_name }}
+        ip add {{ interface.ip }} {{ interface.mask }}
+        no shutdown
+{% endfor %}

@@ -1,0 +1,5 @@
+router ospf {{ router_dict.ospf_dict.ospf_process_id }}
+    router-id {{ router_dict.ospf_dict.router_id }}
+    {% for network in router_dict.ospf_dict.network_list %}
+        network {{ network.network }} {{ network.wildmask }} area {{ network.area }}
+    {% endfor %}
