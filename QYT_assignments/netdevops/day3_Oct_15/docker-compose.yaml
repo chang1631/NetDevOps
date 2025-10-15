@@ -1,0 +1,46 @@
+services:
+  redis:
+    image: redis:7.0.5
+    ports:
+      - "6379"
+    command: >
+      --requirepass Cisc0123
+    networks:
+      - fastapi
+
+  fastapi:
+    build:
+      context: ./fastapi/
+    privileged: true
+    ports:
+      - "8000:8000"
+    restart: always
+    networks:
+      - fastapi
+    depends_on:
+      - redis
+
+  caddy:
+    image: caddy:2.9.1
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./fastapi/fastapi.crt:/etc/caddy/fastapi.crt
+      - ./fastapi/fastapi.key:/etc/caddy/fastapi.key
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - fastapi
+    depends_on:
+      - fastapi
+
+networks:
+  fastapi:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

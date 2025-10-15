@@ -1,0 +1,17 @@
+:443 {
+    # 导入现有SSL证书
+    tls /etc/caddy/fastapi.crt /etc/caddy/fastapi.key
+
+    # 反向代理到fastapi服务（使用Docker服务名称）
+    reverse_proxy fastapi:8000
+
+    log {
+        output file /data/access.log
+        format json
+    }
+}
+
+# HTTP自动重定向到HTTPS
+:80 {
+    redir https://{host}{uri} permanent
+} 
