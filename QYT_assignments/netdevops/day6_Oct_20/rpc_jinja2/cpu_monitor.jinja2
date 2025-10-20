@@ -1,0 +1,9 @@
+<get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <filter>
+    <cpu-usage xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-process-cpu-oper">
+      <cpu-utilization>
+        <{{ time_interval }}/>
+      </cpu-utilization>
+    </cpu-usage>
+  </filter>
+</get>

@@ -1,0 +1,56 @@
+version: '3'
+services:
+    yangsuite:
+      image: collinsctk/yangsuite_yangsuite:latest
+      user: root
+      environment:
+        - DJANGO_SETTINGS_MODULE=yangsuite.settings.production
+        - MEDIA_ROOT=/ys-data/
+        - STATIC_ROOT=/ys-static/
+        - DJANGO_ALLOWED_HOSTS=*
+        # Be sure and change admin/superuser before build or after you login
+        - YS_ADMIN_USER=admin
+        - YS_ADMIN_EMAIL=admin@qytang.com
+        - YS_ADMIN_PASS=qytangccies
+      command: /yangsuite/migrate_and_start.sh
+      ports:
+        # gNMI insecure port (IOS-XE)
+        - "50052:50052"
+        # gNMI insecure port (NX-OS)
+        - "50051:50051"
+        # gNMI secure port (IOS-XE, NX-OS)
+        - "9339:9339"
+        # gRPC MDT telemetry insecure port (IOS-XE)
+        - "57344:57344"
+        # gRPC MDT telemetry secure port (IOS-XE)
+        - "57345:57345"
+      volumes:
+        - static-content:/ys-static
+        - uwsgi:/yangsuite/uwsgi
+#        - ./ys-data:/ys-data
+    nginx:
+      image: collinsctk/yangsuite_nginx:latest
+      depends_on:
+        - yangsuite
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - static-content:/etc/nginx/html
+        - uwsgi:/var/run/uwsgi
+    backup:
+      image: collinsctk/yangsuite_backup:latest
+      command: ['/code/run_cron.sh']
+      depends_on:
+        - yangsuite
+      environment:
+        - DATA_DIR=/ysdata
+        - CRON_EXP=${YS_BACKUP_CRON:-*/30 * * * *}
+        - NO_BACKUP=${YS_NO_BACKUP:-false}
+        - MAX_BACKUP=${YS_MAX_BACKUP:-2}
+      volumes:
+        - ./ys-data:/ysdata
+        - ./ys-backup:/backup
+volumes:
+    static-content:
+    uwsgi:
