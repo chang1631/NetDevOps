@@ -1,0 +1,112 @@
+openapi: 3.0.1
+info:
+  title: NetDevOps RESTCONF作业
+  version: 1.0.0
+
+servers:
+  - url: https://10.10.1.101/restconf/data    # 默认环境的servers UL
+    description: Cisco C8k RESTCONF测试环境
+
+paths:
+  /Cisco-IOS-XE-process-cpu-oper:cpu-usage/cpu-utilization/five-seconds:
+    get:
+      summary: 获取五秒内CPU利用率
+      description: 查询设备5秒内CPU利用率
+      x-apifox-status: developing
+      deprecated: false
+      parameters:
+        - name: Accept
+          in: header
+          required: true
+          description: 指定响应内容格式
+          schema:
+            type: string
+            example: application/yang-data+json
+      responses:
+        '200':
+          description: 成功获取CPU利用率
+          content:
+            application/yang-data+json:
+              schema:
+                type: object
+
+  /Cisco-IOS-XE-native:native/logging:
+    get:
+      summary: 获取SYSLOG配置
+      description: 读取当前设备的SYSLOG配置
+      x-apifox-status: developing
+      deprecated: false
+      parameters:
+        - name: Accept
+          in: header
+          required: true
+          description: 指定响应内容格式
+          schema:
+            type: string
+            example: application/yang-data+json
+        - name: Content-Type
+          in: header
+          required: false
+          description: 指定请求体格式
+          schema:
+            type: string
+            example: application/yang-data+json
+      responses:
+        '200':
+          description: 成功获取配置
+          content:
+            application/yang-data+json:
+              schema:
+                type: object
+
+    put:
+      summary: 配置SYSLOG服务器
+      description: 修改或设置设备SYSLOG服务器
+      x-apifox-status: developing
+      deprecated: false
+      parameters:
+        - name: Accept
+          in: header
+          required: true
+          description: 指定响应内容格式
+          schema:
+            type: string
+            example: application/yang-data+json
+        - name: Content-Type
+          in: header
+          required: true
+          description: 指定请求体格式
+          schema:
+            type: string
+            example: application/yang-data+json
+      requestBody:
+        required: true
+        content:
+          application/yang-data+json:
+            schema:
+              type: object    # 声明数据类型
+              properties:     # 列出对象包含的键和值的类型
+                Cisco-IOS-XE-native:logging:
+                  type: object
+                  properties:
+                    trap:
+                      type: object
+                      properties:
+                        severity:
+                          type: integer
+                          example: 3
+                    hostip:
+                      type: string
+                      example: 10.1.1.162
+            example:        # 样例数据
+              Cisco-IOS-XE-native:logging:
+                trap:
+                  severity: 3
+                hostip: 10.1.1.162
+      responses:
+        '200':
+          description: 配置成功
+          content:
+            application/yang-data+json:
+              schema:
+                type: object
